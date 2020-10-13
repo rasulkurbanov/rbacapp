@@ -48,6 +48,7 @@ app.listen(PORT, () => console.log(`Server running PORT on ${PORT}`))
 
 
 
+// @desc 
 
 // @desc  GET all bootcamps
 // @route GET /api/v1/bootcamps
