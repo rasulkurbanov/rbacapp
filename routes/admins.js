@@ -2,21 +2,22 @@ const express = require('express')
 const router = express.Router()
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
-const User = require('../models/User')
+const Admin = require('../models/Admin')
 const config = require('../config/database')
 
 
 //@desc /api/users/register endpoint's router
 router.post('/register', (req, res) => {
-  let newUser = new User.UserModel({
+  let newAdmin = new Admin.AdminModel({
     name: req.body.name,
     username: req.body.username,
     email: req.body.email,
     contact: req.body.contact,
-    password: req.body.password
+    password: req.body.password,
+    job_profile: req.body.job_profile
   })
 
-  User.addUser(newUser, (err, user) => {
+  Admin.addAdmin(newAdmin, (err, user) => {
     if (err) {
         let message = "";
         if (err.errors.username) message = "Username is already taken. ";
@@ -28,7 +29,7 @@ router.post('/register', (req, res) => {
     } else {
         return res.json({
             success: true,
-            message: "User registration is successful."
+            message: "Admin registration is successful."
         });
     }
   });
@@ -41,26 +42,27 @@ router.post('/login', (req, res) => {
   const password = req.body.password;
 
   //@desc Getting user
-  User.getUserByUsername(username, (err, user) => {
+  Admin.getAdminByUsername(username, (err, user) => {
       if (err) throw err;
       if (!user) {
           return res.json({
               success: false,
-              message: "User not found."
+              message: "Admin not found."
           });
       }
       //@desc Comparing sent password to database-inserted password
-      User.comparePassword(password, user.password, (err, isMatch) => {
+      Admin.comparePassword(password, user.password, (err, isMatch) => {
           if (err) throw err;
           if (isMatch) {
               const token = jwt.sign({
-                  type: "user",
+                  type: "admin",
                   data: {
                       _id: user._id,
                       username: user.username,
                       name: user.name,
                       email: user.email,
-                      contact: user.contact
+                      contact: user.contact,
+                      job_profile: user.job_profile
                   }
               }, config.secret, {
                   expiresIn: 604800 // for 1 week time in milliseconds

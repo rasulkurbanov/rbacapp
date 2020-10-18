@@ -12,9 +12,10 @@ const config = require('./config/database')
 
 //@desc Importing users router
 const users = require('./routes/users')
+const admins = require('./routes/admins')
 
 //@desc Connecting to MongoDB rbac_based_app database
-mongoose.connect(config.database, {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
+mongoose.connect(config.database, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
   .then(() => console.log(`Successfully connected to the database`))
   .catch((err) => console.log(err))
 
@@ -27,15 +28,30 @@ app.use(express.static(path.join(__dirname, 'public')))
 //@desc Bodyparser middleware
 app.use(bodyParser.json())
 
-//@desc Setting Passwort middleware
+// @desc Setting a middleware function to check the user type
+function checkUserType(req, res, next) {
+  const userType = req.originalUrl.split('/')[2]
+  
+  //@desc Importing passport-jwt function and giving passport as an argument
+  const takePass = require('./config/passport')
+  takePass(userType, passport)
+  next()
+}
+app.use(checkUserType)
+
+//@desc Setting Passport middleware
 app.use(passport.initialize())
 app.use(passport.session())
 
 
 
-app.get('/', (req, res) => res.send({"greeting": "Assalomu alaykum"}))
+app.get('/', (req, res) => res.send({ "greeting": "Assalomu alaykum" }))
+
+
 
 app.use('/api/users', users)
+app.use('/api/admins', admins)
+
 
 //@descListening for the PORT 
 app.listen(PORT, () => console.log(`Server running PORT on ${PORT}`))
