@@ -1,7 +1,7 @@
 {
   "name": "role-controller",
   "version": "1.0.0",
-  "description": "",
+  "description": "Role Based Access Control in mongodb",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js"
